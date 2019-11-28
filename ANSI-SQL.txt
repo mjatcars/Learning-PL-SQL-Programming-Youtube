@@ -1,0 +1,119 @@
+
+
+*******************************   *********************************
+*******************************   *********************************
+******************************* Log in as system user  *********************************
+sqlplus system/manager as sysdba
+
+*******************************  ON VS USING  *********************************
+*** NOTE: Problably should not use "natural join" because it just matches liked named columns as opposed to
+*** the actual key columns and it might not give desired results 
+https://stackoverflow.com/questions/10432107/difference-between-on-clause-and-using-clause-in-sql
+
+The USING clause is used if several columns share the same name but you don’t want to join using all of these common columns. The columns listed in the USING clause can’t have any qualifiers in the statement, including the WHERE clause:
+
+The ON clause is used to join tables where the column names don’t match in both tables. The join conditions are removed from the filter conditions in the WHERE clause:
+
+select department_name, city
+from departments
+JOIN locations
+USING (location_id); -- specify the same column name 
+                     -- for both of the tables for the join
+select department_name, city
+from departments dept
+join locations loc
+on (dept.location_id = loc.id); -- specify different column name 
+                                -- for the tables for the join.
+
+******************************* INNER VS EQUI JOIN   *********************************
+https://www.quora.com/What-is-the-difference-between-inner-join-and-equijoin-in-Oracle
+Inner Join :
+SELECT * FROM emp_table JOIN dept_table
+ON emp_table.DeptID = dept_table.DeptID;
+
+Equi Join
+SELECT * FROM emp_table INNER JOIN dept_table USING(DeptID)
+Both will give you same results.
+
+The difference here is for the Inner join can have a different condition , such as “=” , <> , > , < etc, but same is not true for equi join.
+
+Notes :
+Inner join can have equality (=) and other operators (like <,>,<>) in the join condition.
+Equi join only have equality (=) operator in the join condition.
+Equi join can be an Inner join, Left Outer join, Right Outer join
+The USING clause is not supported by SQL Server and Sybase. This clause is supported by Oracle and MySQL.
+
+************************* ORACLE EXAMPLES WITH THE SCOTT/TIGER EMP SCHEMA  *************************
+http://www.srikanthtechnologies.com/oracle/dec9/hrqueries.html
+he USING clause
+
+****************************** EXERCISES USING SQL IN BROWSER AND EXAMPLES  *****************************
+https://www.w3resource.com/sql-exercises/sql-joins-exercises.php
+
+salesman    salesman_id |    name    |   city   | commission 
+customer     customer_id |   cust_name    |    city    | grade | salesman_id 
+orders       ord_no      purch_amt   ord_date    customer_id  salesman_id
+
+
+3. Write a SQL statement to know which salesman are working for which customer
+SELECT DISTINCT CUST_NAME ,S.NAME SALESMAN_NAME
+FROM SALESMAN S INNER JOIN CUSTOMER C
+ON S.SALESMAN_ID =  C.SALESMAN_ID
+ORDER BY 1,2
+
+
+6. Write a SQL statement to find the details of a order i.e. order number, order date, amount of order, which customer gives the order and which salesman works for that customer and how much commission he gets for an order. 
+SELECT  O.ORD_NO, O.ORD_DATE, O.PURCH_AMT, C.CUST_NAME, S.NAME SALESMAN_NAME
+FROM ORDERS O INNER JOIN CUSTOMER C 
+     ON O.CUSTOMER_ID = C.CUSTOMER_ID
+     INNER JOIN SALESMAN S 
+     ON C.SALESMAN_ID = S.SALESMAN_ID
+ORDER BY 1
+
+7. Write a SQL statement to make a join on the tables salesman, customer and orders in such a form that the same column of each table will appear once and only the relational rows will come.
+
+8. Write a SQL statement to make a list in ascending order for the customer who works either through a salesman or by own.  
+SELECT CUSTOMER_ID, CUST_NAME, C.SALESMAN_ID, S.NAME AS "SALESMAN NAME" 
+FROM CUSTOMER C
+LEFT OUTER JOIN SALESMAN S ON C.SALESMAN_ID = S.SALESMAN_ID
+ORDER BY 1
+
+10. Write a SQL statement to make a report with customer name, city, order number, order date, and order amount in ascending order according to the order date to find that either any of the existing customers have placed no order or placed one or more orders.
+SELECT CUST_NAME, CITY, ORD_NO, ORD_DATE, PURCH_AMT AS "ORD_AMT"
+FROM CUSTOMER C
+LEFT JOIN ORDERS O USING (CUSTOMER_ID)
+ORDER BY 4 
+
+11. customer name, city, order number, order date, order amount salesman name and commission to find that either any of the existing customers have placed no order or placed one or more orders by their salesman or by own
+SELECT *
+FROM CUSTOMER C
+LEFT OUTER JOIN ORDERS O ON C.CUSTOMER_ID = O.CUSTOMER_ID
+LEFT OUTER JOIN SALESMAN S ON O.SALESMAN_ID = S.SALESMAN_ID
+ORDER BY 4 
+
+
+13. salesmen who works either for one or more customer or not yet join under any of the customers who placed either one or more orders or no order to their supplier.
+SELECT *
+FROM SALESMAN S
+LEFT OUTER JOIN CUSTOMER C ON S.SALESMAN_ID = C.SALESMAN_ID
+LEFT OUTER JOIN ORDERS O ON C.CUSTOMER_ID = O.CUSTOMER_ID
+ORDER BY ORD_NO
+
+14. salesmen who either work for one or more customers or yet to join any of the customer. The customer may have placed, either one or more orders on or above order amount 2000 and must have a grade, or he may not have placed any order to the associated supplier
+SELECT *
+FROM SALESMAN S
+LEFT OUTER JOIN CUSTOMER C ON S.SALESMAN_ID = C.SALESMAN_ID
+LEFT OUTER JOIN ORDERS O ON C.CUSTOMER_ID = O.CUSTOMER_ID
+WHERE C.GRADE IS NOT NULL AND O.PURCH_AMT >= 2000 
+ORDER BY ORD_NO
+
+15. customer name, city, order no. order date, purchase amount for those customers from the existing list who placed one or more orders or which order(s) have been placed by the customer who is not on the list
+
+
+
+
+
+
+
+
+
